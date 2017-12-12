@@ -25,7 +25,7 @@ function getPrinter(title, bool) {
 }
 
 var DEBUG_STATUS_UPDATES = true;
-const printStatusInfo = getPrinter('status', DEBUG_STATUS_UPDATES)
+const printStatusInfo = getPrinter('status', DEBUG_STATUS_UPDATES);
 
 const EventEmitter = require('events');
 
@@ -42,10 +42,10 @@ var sysNodePath = '';
 sysNodePath = {
 	'darwin': '/usr/',
 	'win32': path.join(process.env.ProgramFiles, 'nodejs', 'node.exe'), // get using windows registry.
-	'linux': '',
+	'linux': '/usr/local/bin/node',
 }[os];
 
-if(os === 'linux' || os === 'darwin') {
+if(os === 'darwin') {
 	console.error('backend_manager.js IMPLEMENT ME!');
 }
 

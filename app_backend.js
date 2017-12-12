@@ -6,14 +6,14 @@ process.send({
 	nodeArch: process.arch,
 	path: process.cwd(),
 	paths: module.paths,
-})
+});
 setTimeout(function(){
 	console.log('done');
 	process.send({
 		nodeVersion: process.version,
 		nodeArch: process.arch,
 		path: process.cwd(),
-	})
+	});
 }, 1000);
 
 process.on('unhandledRejection', function(reason, p) {
@@ -31,7 +31,7 @@ var eventMap = require('./lib/backend_manager_events.js').events;
 
 try {
 
-var dcPath = path.join(process.cwd(),'node_modules','ljswitchboard-ljm_device_curator')
+var dcPath = path.join(process.cwd(),'node_modules','ljswitchboard-ljm_device_curator');
 var device_curator = require(dcPath);
 var ljm_device_manager = require('ljswitchboard-ljm_device_manager');
 var deviceManager = ljm_device_manager.load();
