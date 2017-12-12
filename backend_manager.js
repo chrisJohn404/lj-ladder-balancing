@@ -39,11 +39,16 @@ if(typeof(os) === 'undefined') {
 }
 
 var sysNodePath = '';
-sysNodePath = {
-	'darwin': '/usr/',
-	'win32': path.join(process.env.ProgramFiles, 'nodejs', 'node.exe'), // get using windows registry.
-	'linux': '/usr/local/bin/node',
-}[os];
+function setNodePath(os) {
+	if(os === 'darwin') {
+		sysNodePath = '/usr/';
+	} else if(os === 'win32') {
+		sysNodePath = path.join(process.env.ProgramFiles, 'nodejs', 'node.exe');
+	} else if(os === 'linux') {
+		sysNodePath = '/usr/local/bin/node';
+	}
+}
+setNodePath(os);
 
 if(os === 'darwin') {
 	console.error('backend_manager.js IMPLEMENT ME!');
