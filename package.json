@@ -1,0 +1,34 @@
+{
+  "name": "lj-ladder-balancing",
+  "version": "0.0.1",
+  "description": "see README.md",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisJohn404/lj-ladder-balancing.git"
+  },
+  "author": "chrisjohn404",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chrisJohn404/lj-ladder-balancing/issues"
+  },
+  "homepage": "https://github.com/chrisJohn404/lj-ladder-balancing#readme",
+  "devDependencies": {
+    "electron": "1.7.9"
+  },
+  "keywords": [
+    "LabJack",
+    "Electron",
+    "game"
+  ],
+  "dependencies": {
+    "async": "^2.6.0",
+    "ljswitchboard-ljm_device_curator": "git://github.com/chrisJohn404/ljswitchboard-ljm_device_curator.git#master",
+    "ljswitchboard-ljm_device_manager": "git://github.com/chrisJohn404/ljswitchboard-ljm_device_manager.git#master",
+    "q": "^1.5.1"
+  }
+}
