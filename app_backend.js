@@ -49,6 +49,7 @@ dmEventKeys.forEach(function(eventKey) {
 });
 
 var gameState = {
+	'curTime': new Date(),
 	'AIN0_VAL': 0,
 	'USER_ON_LADDER': false,
 	'LADDER_ON_GROUND': false,
@@ -142,7 +143,7 @@ function updateDisplay() {
 	// process.send({devInfo:device.savedAttributes});
 
 
-	updateTime();
+	// updateTime();
 	updateState();
 
 	// setTimeout(updateDisplay, 1000)
@@ -154,6 +155,7 @@ function collectData() {
 	var device = getDevice();
 	device.iRead('AIN0').then(function(res) {
 		gameState.AIN0_VAL = res.val;
+		gameState.curTime = new Date();
 		
 		// setTimeout(collectData, 50);
 	}, function(err) {
