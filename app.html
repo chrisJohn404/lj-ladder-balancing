@@ -14,40 +14,140 @@
     <title>Hello World!</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
+    <h1>Thrust Master 2020</h1>
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
+    <!-- We are using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.<br>
+    and Electron <script>document.write(process.versions.electron)</script>.<br> -->
+    <div style="float:left">
+      <span>Current Time: </span><span id="CURRENT_TIME"></span><br>
+      <span>Standing?</span>   <span id="isStandingOnLadder"></span><br>
+      <span>Ladder Feet on Ground?</span>   <span id="areFeetOnGround"></span><br>
+      <span>Balancing?</span>   <span id="isBalancingOnLadder"></span><br>
+      <span>Game State:</span>   <span id="curGameState"></span><br>
 
+      <br>
+      <br>
+      <span>Thrust Duration:</span>   <span id="curThrustDuration"></span><br>
 
-    Current Time: <span id="CURRENT_TIME"></span><br>
-    AIN0 Value: <span id="AIN0_VAL"></span><br>
+      <span>Last Thrust Duration:</span>   <span id="lastThrustDuration"></span><br>
+      <span>Game Message:</span>   <span id="gameMessage"></span><br>
+    </div>
+    <div style="float:right">
+      <span>Top 10 Score History:</span><br>
+      <div id="historicalScoresHolder">
+      </div>
+    </div>
+    
+    <!-- AIN0 Value: <span id="AIN0_VAL"></span><br> -->
 
     <script>
+      var handlebars = require('./libs/handlebars.js');
+      var scoreHistoryTemplate = handlebars.compile('<ol>{{#each scores}}<li>{{score}}</li>{{/each}}</ol>')
+      var scoreHistory = [];
+      var numScoresToHold = 10;
+      function compareNumbers(a, b) {
+        return a - b;
+      }
+      function addTime(newTime) {
+        scoreHistory = scoreHistory.sort(compareNumbers);
+
+        if(scoreHistory.length < numScoresToHold) {
+          scoreHistory.push(newTime);
+        } else {
+          var addNewTime = false;
+          scoreHistory.forEach(function(score) {
+            if(score < newTime) {
+              addNewTime = true;
+            }
+          });
+
+          if(addNewTime) {
+            scoreHistory = scoreHistory.splice(1);
+            scoreHistory.push(newTime);
+          }
+        }
+
+        scoreHistory = scoreHistory.sort(compareNumbers);
+      }
+      function updateScores() {
+        scoreHistory = scoreHistory.sort(compareNumbers);
+        var data = {
+          scores:[],
+        }
+        scoreHistory.reverse().forEach(function(score) {
+          data.scores.push({score:score});
+        })
+        console.log('Score History', scoreHistory.reverse());
+        var newHTML = scoreHistoryTemplate(data);
+        cachedElements.historicalScoresHolder.html(newHTML);
+      }
       var cachedElements = {
         currentTime: $('#CURRENT_TIME'),
         ain0Val: $('#AIN0_VAL'),
+        isStandingOnLadder: $('#isStandingOnLadder'),
+        areFeetOnGround: $('#areFeetOnGround'),
+        isBalancingOnLadder: $('#isBalancingOnLadder'),
+        curGameState: $('#curGameState'),
+
+        curThrustDuration:$('#curThrustDuration'),
+        lastThrustDuration:$('#lastThrustDuration'),
+        gameMessage: $('#gameMessage'),
+
+        historicalScoresHolder: $('#historicalScoresHolder'),
       };
       // You can also require other files to run in this process
       var backend_manager = require('./backend_manager.js');
       var backendManager = backend_manager.backendManager;
       backendManager.on(backend_manager.events.BACKEND_STARTED, () => {
-        console.log('backend has started')
-      })
+        console.log('backend has started');
+      });
 
       backendManager.on(backend_manager.events.UPDATE_CURRENT_TIME, (time) => {
         // console.log('updating time');
         cachedElements.currentTime.text(time.toString());
-      })
+      });
 
       backendManager.on(backend_manager.events.UPDATE_GAME_STATE, (data) => {
         // console.log('updating state',data);
 
         cachedElements.ain0Val.text(data.AIN0_VAL);
         cachedElements.currentTime.text(data.curTime.toString());
+
+        // Update states
+        if(data.FIO4) {
+          cachedElements.areFeetOnGround.text('Yes');
+        } else {
+          cachedElements.areFeetOnGround.text('No')
+        }
+        if(data.FIO5) {
+          cachedElements.isStandingOnLadder.text('Yes')
+        } else {
+          cachedElements.isStandingOnLadder.text('No')
+        }
+        
+        if(data.currentState === 'balancing') {
+          cachedElements.isBalancingOnLadder.text('Yes')
+        } else {
+          cachedElements.isBalancingOnLadder.text('No')
+        }
+        cachedElements.curGameState.text(data.currentState)
+
+
+        // Always update the current duration...
+        cachedElements.curThrustDuration.text(data.duration.toString());
+
+        if(!data.timeReported) {
+          cachedElements.lastThrustDuration.text(data.duration.toString());
+          addTime(data.duration);
+          updateScores();
+        }
+        if(!data.messageReported) {
+          cachedElements.gameMessage.text(data.message);
+        }
+
         // cachedElements.currentTime.text(time.toString());
-      })
+      });
       
 
 
@@ -58,9 +158,9 @@
       $(document).ready(function() {
         console.log('READY');
         backendManager.initialize();
-      })
+      });
       $(window).on('beforeunload', function(){
-        console.log('unloading...')
+        console.log('unloading...');
         backendManager.terminate();
       });
 

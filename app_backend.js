@@ -24,6 +24,36 @@ process.on('uncaughtException', function(err) {
 });
 
 
+
+
+function getGameState(FIO4, FIO5) {
+	var state = '';
+	if(FIO4 == 1) {
+		// Legs are on ground
+		if(FIO5 == 1) {
+			// User is on ladder
+			state='ready';
+		} else {
+			// User is off ladder
+			state='readyForNewUser';
+		}
+	} else {
+		// Legs are off ground
+		if(FIO5 == 1) {
+			// User is on ladder
+			state='balancing';
+		} else {
+			// User is off ladder
+			state='notReady';
+		}
+	}
+	return state;
+}
+var channelMeanings = {
+	'FIO4': 'legs',
+	'FIO5': 'standing'
+};
+
 var q = require('q');
 var async = require('async');
 var path = require('path');
@@ -51,17 +81,30 @@ dmEventKeys.forEach(function(eventKey) {
 var gameState = {
 	'curTime': new Date(),
 	'AIN0_VAL': 0,
+	'FIO4': 0,
+	'FIO5': 0,
 	'USER_ON_LADDER': false,
 	'LADDER_ON_GROUND': false,
 	'sn': 0,
 	'ct': '',
-}
+	'currentState': 'notReady',
+	'startTimeMS': 0,
+	'finishingTimeMS': 0,
+	'cheated': false,
+
+	'duration': 0,
+	'timeReported': true,
+
+	'message': '',
+	'messageReported': true,
+	
+};
 
 var openedDeviceInfo;
 function openDevice() {
 	var defered = q.defer();
 
-	deviceManager.open()
+	deviceManager.open({deviceType:'LJM_dtT4',connectionType:'LJM_ctEthernet',identifier:440010101})
 	.then(function(deviceInfo) {
 		openedDeviceInfo = {
 			'dt': deviceInfo.savedAttributes.productType,
@@ -127,7 +170,14 @@ function updateTime() {
 
 
 function updateState(val) {
-	sendEvent(eventMap.UPDATE_GAME_STATE, gameState)
+	sendEvent(eventMap.UPDATE_GAME_STATE, gameState);
+	if(gameState.timeReported == false) {
+		gameState.timeReported = true;
+		gameState.duration = 0;
+	}
+	if(gameState.messageReported == false ) {
+		gameState.messageReported = true;
+	}
 }
 function updateDisplay() {
 	// var defered = q.defer();
@@ -145,6 +195,7 @@ function updateDisplay() {
 
 	// updateTime();
 	updateState();
+	
 
 	// setTimeout(updateDisplay, 1000)
 	// defered.resolve();
@@ -153,17 +204,92 @@ function updateDisplay() {
 
 function collectData() {
 	var device = getDevice();
-	device.iRead('AIN0').then(function(res) {
-		gameState.AIN0_VAL = res.val;
+	device.iReadMany(['AIN0','FIO4','FIO5']).then(function(results) {
+
+		gameState.AIN0_VAL = results[0].val;
+		gameState.FIO4 = results[1].val;
+		gameState.FIO5 = results[2].val;
+
+		var curState = gameState.currentState;
+		var newState = getGameState(gameState.FIO4, gameState.FIO5);
+
+		if(newState != curState) {
+			// Started a new thrust...
+			if(curState === 'ready' && newState === 'balancing') {
+				gameState.startTimeMS = new Date() - 0;
+			}
+
+			// Finished successfully
+			if(curState === 'balancing' && newState === 'ready') {
+				if(!gameState.cheated) {
+					gameState.finishingTimeMS = new Date() - 0;
+					gameState.duration = gameState.finishingTimeMS - gameState.startTimeMS;
+					gameState.message = 'You thrusted!';
+					gameState.timeReported = false;
+					gameState.messageReported = false;
+				} else {
+					gameState.message = 'Ready';
+					gameState.messageReported = false;
+				}
+			}
+
+			// Falling off
+			if(curState === 'balancing' && newState === 'notReady') {
+				gameState.startTimeMS = 0;
+				gameState.finishingTimeMS = 0;
+				gameState.duration = 0;
+				gameState.message = 'You Failed!';
+				gameState.messageReported = false;
+			}
+			if(curState === 'notReady' && newState === 'balancing') {
+				gameState.startTimeMS = 0;
+				gameState.finishingTimeMS = 0;
+				gameState.duration = 0;
+				gameState.message = 'Stop Cheating!!, return to ready position!';
+				gameState.messageReported = false;
+				gameState.cheated = true;
+			}
+		} else {
+			if(newState === 'readyForNewUser') {
+				gameState.startTimeMS = 0;
+				gameState.finishingTimeMS = 0;
+				gameState.duration = 0;
+				gameState.timeReported = true;
+				gameState.messageReported = true;
+			}
+			if(newState === 'balancing') {
+				if(!gameState.cheated) {
+					gameState.duration = new Date() - gameState.startTimeMS;
+				}
+			}
+			if(newState === 'ready') {
+				gameState.cheated = false;
+				gameState.startTimeMS = 0;
+				gameState.finishingTimeMS = 0;
+				gameState.duration = 0;
+			}
+			if(newState === 'notReady') {
+				gameState.startTimeMS = 0;
+				gameState.finishingTimeMS = 0;
+				gameState.duration = 0;
+			}
+		}
+
+		gameState.currentState = newState;
 		gameState.curTime = new Date();
+
+
+		if(!gameState.timeReported || !gameState.messageReported) {
+			updateState();
+		}
 		
 		// setTimeout(collectData, 50);
 	}, function(err) {
-		gameState.AIN0_VAL = 'err';
+		gameState.currentState = 'connect T4';
 
 		// updateState();
 		// setTimeout(collectData, 50);
-	})
+	});
 	
 }
 function startApp() {
