@@ -14,29 +14,31 @@
     <title>Hello World!</title>
   </head>
   <body>
-    <h1>Thrust Master 2020</h1>
+    
     <!-- All of the Node.js APIs are available in this renderer process. -->
     <!-- We are using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.<br> -->
-    <div style="float:left">
+    <div style="top:0px; position: absolute;">
+      <h1>Thrust Master 2020</h1>
+      <span>Game State:</span>   <span id="curGameState"></span><br>
+      <span>Thrust Duration:</span>   <span id="curThrustDuration"></span><br>
+      <span>Last Thrust Duration:</span>   <span id="lastThrustDuration"></span><br>
+      <span>Game Message:</span>   <span id="gameMessage"></span><br>
+    </div>
+    <div style="top:30px; right:30px;position: absolute;">
+      <span>Longest Thrust Sessions:</span><br>
+      <div id="historicalScoresHolder">
+      </div>
+      <button id="resetScoresButton">Reset Scores</button>
+    </div>
+    <div style="bottom:0px; position: absolute;">
+      <span>Device SN: </span><span id="DEVICE_SN"></span><br>
       <span>Current Time: </span><span id="CURRENT_TIME"></span><br>
       <span>Standing?</span>   <span id="isStandingOnLadder"></span><br>
       <span>Ladder Feet on Ground?</span>   <span id="areFeetOnGround"></span><br>
       <span>Balancing?</span>   <span id="isBalancingOnLadder"></span><br>
-      <span>Game State:</span>   <span id="curGameState"></span><br>
-
-      <br>
-      <br>
-      <span>Thrust Duration:</span>   <span id="curThrustDuration"></span><br>
-
-      <span>Last Thrust Duration:</span>   <span id="lastThrustDuration"></span><br>
-      <span>Game Message:</span>   <span id="gameMessage"></span><br>
-    </div>
-    <div style="float:right">
-      <span>Top 10 Score History:</span><br>
-      <div id="historicalScoresHolder">
-      </div>
+      
     </div>
     
     <!-- AIN0 Value: <span id="AIN0_VAL"></span><br> -->
@@ -83,6 +85,7 @@
         cachedElements.historicalScoresHolder.html(newHTML);
       }
       var cachedElements = {
+        sn:$('#DEVICE_SN'),
         currentTime: $('#CURRENT_TIME'),
         ain0Val: $('#AIN0_VAL'),
         isStandingOnLadder: $('#isStandingOnLadder'),
@@ -95,7 +98,14 @@
         gameMessage: $('#gameMessage'),
 
         historicalScoresHolder: $('#historicalScoresHolder'),
+
+        resetScoresButton: $('#resetScoresButton'),
       };
+
+      cachedElements.resetScoresButton.on('click', function() {
+        scoreHistory = [];
+        updateScores();
+      })
       // You can also require other files to run in this process
       var backend_manager = require('./backend_manager.js');
       var backendManager = backend_manager.backendManager;
@@ -108,12 +118,20 @@
         cachedElements.currentTime.text(time.toString());
       });
 
+
+      var toGUIState = {
+        'readyForNewUser': 'Ready for next thruster.',
+        'ready': 'Ready for some thrusting.',
+        'balancing': 'Keep Thrusting!',
+        'notReady': 'Thats not how you thrust :(',
+      }
       backendManager.on(backend_manager.events.UPDATE_GAME_STATE, (data) => {
         // console.log('updating state',data);
 
+
         cachedElements.ain0Val.text(data.AIN0_VAL);
         cachedElements.currentTime.text(data.curTime.toString());
-
+        cachedElements.sn.text(data.sn);
         // Update states
         if(data.FIO4) {
           cachedElements.areFeetOnGround.text('Yes');
@@ -131,7 +149,8 @@
         } else {
           cachedElements.isBalancingOnLadder.text('No')
         }
-        cachedElements.curGameState.text(data.currentState)
+
+        cachedElements.curGameState.text(toGUIState[data.currentState])
 
 
         // Always update the current duration...

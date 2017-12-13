@@ -37,7 +37,7 @@ function createWindow () {
   });
 
   // Open Dev tools
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
   
 }
 

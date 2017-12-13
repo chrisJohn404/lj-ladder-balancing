@@ -110,7 +110,7 @@ function openDevice() {
 	} else {
 		options = {deviceType:'LJM_dtT4',connectionType:'LJM_ctUSB',identifier:440010101};
 	}
-	deviceManager.open()
+	deviceManager.open(options)
 	.then(function(deviceInfo) {
 		openedDeviceInfo = {
 			'dt': deviceInfo.savedAttributes.productType,
