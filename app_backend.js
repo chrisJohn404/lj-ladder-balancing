@@ -301,7 +301,7 @@ function collectData() {
 function startApp() {
 	var defered = q.defer();
 	// Start the dislay updating loop.
-	setInterval(updateDisplay, 250);
+	setInterval(updateDisplay, 500);
 	setInterval(collectData, 50);
 	
 
