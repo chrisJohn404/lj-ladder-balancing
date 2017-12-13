@@ -98,6 +98,9 @@ var gameState = {
 	'message': '',
 	'messageReported': true,
 	
+	'displayRandomFail': false,
+	'displayRandomThrust': false,
+	'numRandomThrustCounter': 0,
 };
 
 var openedDeviceInfo;
@@ -184,6 +187,8 @@ function updateState(val) {
 	if(gameState.messageReported == false ) {
 		gameState.messageReported = true;
 	}
+	gameState.displayRandomFail = false;
+	gameState.displayRandomThrust = false;
 }
 function updateDisplay() {
 	// var defered = q.defer();
@@ -223,6 +228,7 @@ function collectData() {
 			// Started a new thrust...
 			if(curState === 'ready' && newState === 'balancing') {
 				gameState.startTimeMS = new Date() - 0;
+				gameState.numRandomThrustCounter = 1;
 			}
 
 			// Finished successfully
@@ -233,9 +239,11 @@ function collectData() {
 					gameState.message = 'You thrusted!';
 					gameState.timeReported = false;
 					gameState.messageReported = false;
+					gameState.numRandomThrustCounter = 1;
 				} else {
 					gameState.message = 'Ready';
 					gameState.messageReported = false;
+					gameState.numRandomThrustCounter = 1;
 				}
 			}
 
@@ -246,6 +254,8 @@ function collectData() {
 				gameState.duration = 0;
 				gameState.message = 'You Failed!';
 				gameState.messageReported = false;
+				gameState.displayRandomFail = true;
+				gameState.numRandomThrustCounter = 1;
 			}
 			if(curState === 'notReady' && newState === 'balancing') {
 				gameState.startTimeMS = 0;
@@ -262,10 +272,16 @@ function collectData() {
 				gameState.duration = 0;
 				gameState.timeReported = true;
 				gameState.messageReported = true;
+				gameState.numRandomThrustCounter = 1;
 			}
 			if(newState === 'balancing') {
 				if(!gameState.cheated) {
 					gameState.duration = new Date() - gameState.startTimeMS;
+					if(gameState.duration > gameState.numRandomThrustCounter*2000) {
+						gameState.displayRandomThrust = true;
+						gameState.numRandomThrustCounter += 1;
+					}
+					
 				}
 			}
 			if(newState === 'ready') {
@@ -273,11 +289,13 @@ function collectData() {
 				gameState.startTimeMS = 0;
 				gameState.finishingTimeMS = 0;
 				gameState.duration = 0;
+				gameState.numRandomThrustCounter = 1;
 			}
 			if(newState === 'notReady') {
 				gameState.startTimeMS = 0;
 				gameState.finishingTimeMS = 0;
 				gameState.duration = 0;
+				gameState.numRandomThrustCounter = 1;
 			}
 		}
 

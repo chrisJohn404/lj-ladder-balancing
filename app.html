@@ -25,6 +25,7 @@
       <span>Thrust Duration:</span>   <span id="curThrustDuration"></span><br>
       <span>Last Thrust Duration:</span>   <span id="lastThrustDuration"></span><br>
       <span>Game Message:</span>   <span id="gameMessage"></span><br>
+      <img id="gameImmage" src=""/>
     </div>
     <div style="top:30px; right:30px;position: absolute;">
       <span>Longest Thrust Sessions:</span><br>
@@ -38,12 +39,45 @@
       <span>Standing?</span>   <span id="isStandingOnLadder"></span><br>
       <span>Ladder Feet on Ground?</span>   <span id="areFeetOnGround"></span><br>
       <span>Balancing?</span>   <span id="isBalancingOnLadder"></span><br>
-      
+      <button id="enterFullScreen">Full Screen</button>
+      <button id="exitFullScreen">Exit Full Screen</button>
     </div>
     
     <!-- AIN0 Value: <span id="AIN0_VAL"></span><br> -->
 
     <script>
+
+      var thrustImages = [
+        './funny_gifs/duff_man.gif',
+        './funny_gifs/jim-carrey.gif',
+        './funny_gifs/storm_trooper.gif',
+      ];
+      var failImages = [
+        './funny_gifs/spiderman_fail.webp',
+        './funny_gifs/mr_garrison_fail.webp',
+      ]
+
+      function getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+      function getRandomImage(array) {
+        var index = Math.round(getRandomArbitrary(0, array.length-1));
+        return array[index];
+      }
+      function hideImage() {
+        cachedElements.gameImmage.attr('src','');
+      }
+      function displayRandomFail() {
+        // var failImage = getRandomImage(failImages);
+        cachedElements.gameImmage.attr('src',getRandomImage(failImages));
+        setTimeout(hideImage, 2000);
+      }
+      function displayRandomThrust() {
+        // var thrustImages = getRandomImage(thrustImages);
+        cachedElements.gameImmage.attr('src',getRandomImage(thrustImages));
+        setTimeout(hideImage, 2000);
+      }
+
       var handlebars = require('./libs/handlebars.js');
       var scoreHistoryTemplate = handlebars.compile('<ol>{{#each scores}}<li>{{score}}</li>{{/each}}</ol>')
       var scoreHistory = [];
@@ -80,7 +114,7 @@
         scoreHistory.reverse().forEach(function(score) {
           data.scores.push({score:score});
         })
-        console.log('Score History', scoreHistory.reverse());
+        // console.log('Score History', scoreHistory.reverse());
         var newHTML = scoreHistoryTemplate(data);
         cachedElements.historicalScoresHolder.html(newHTML);
       }
@@ -100,12 +134,25 @@
         historicalScoresHolder: $('#historicalScoresHolder'),
 
         resetScoresButton: $('#resetScoresButton'),
+        enterFullScreen: $('#enterFullScreen'),
+        exitFullScreen: $('#exitFullScreen'),
+
+        gameImmage: $('#gameImmage'),
       };
 
       cachedElements.resetScoresButton.on('click', function() {
         scoreHistory = [];
         updateScores();
       })
+
+      cachedElements.enterFullScreen.on('click', function() {
+        document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      })
+      cachedElements.exitFullScreen.on('click', function() {
+        document.webkitExitFullscreen()
+      })
+      
+
       // You can also require other files to run in this process
       var backend_manager = require('./backend_manager.js');
       var backendManager = backend_manager.backendManager;
@@ -155,6 +202,13 @@
 
         // Always update the current duration...
         cachedElements.curThrustDuration.text(data.duration.toString());
+        
+        if(data.displayRandomThrust) {
+          displayRandomThrust()
+        }
+        if(data.displayRandomFail) {
+          displayRandomFail()
+        }
 
         if(!data.timeReported) {
           cachedElements.lastThrustDuration.text(data.duration.toString());
