@@ -104,7 +104,13 @@ var openedDeviceInfo;
 function openDevice() {
 	var defered = q.defer();
 
-	deviceManager.open({deviceType:'LJM_dtT4',connectionType:'LJM_ctEthernet',identifier:440010101})
+	var options = {};
+	if(process.platform === 'win32') {
+		options = {deviceType:'LJM_dtT4',connectionType:'LJM_ctEthernet',identifier:440010101};
+	} else {
+		options = {deviceType:'LJM_dtT4',connectionType:'LJM_ctUSB',identifier:440010101};
+	}
+	deviceManager.open()
 	.then(function(deviceInfo) {
 		openedDeviceInfo = {
 			'dt': deviceInfo.savedAttributes.productType,
