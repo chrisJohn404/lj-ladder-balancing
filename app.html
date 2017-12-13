@@ -25,7 +25,7 @@
       <span>Thrust Duration:</span>   <span id="curThrustDuration"></span><br>
       <span>Last Thrust Duration:</span>   <span id="lastThrustDuration"></span><br>
       <span>Game Message:</span>   <span id="gameMessage"></span><br>
-      <img id="gameImmage" src=""/>
+      <img id="gameImmage" src="" style="position:absolute;left:70%;"/>
     </div>
     <div style="top:30px; right:30px;position: absolute;">
       <span>Longest Thrust Sessions:</span><br>
@@ -62,6 +62,7 @@
       }
       function getRandomImage(array) {
         var index = Math.round(getRandomArbitrary(0, array.length-1));
+        // console.log('index...', index);
         return array[index];
       }
       function hideImage() {
@@ -70,12 +71,12 @@
       function displayRandomFail() {
         // var failImage = getRandomImage(failImages);
         cachedElements.gameImmage.attr('src',getRandomImage(failImages));
-        setTimeout(hideImage, 2000);
+        setTimeout(hideImage, 1500);
       }
       function displayRandomThrust() {
         // var thrustImages = getRandomImage(thrustImages);
         cachedElements.gameImmage.attr('src',getRandomImage(thrustImages));
-        setTimeout(hideImage, 2000);
+        setTimeout(hideImage, 1500);
       }
 
       var handlebars = require('./libs/handlebars.js');
