@@ -1,0 +1,27 @@
+.product-title {
+	font-size: 3.15em;
+    /*text-align: center;*/
+    padding-right:200px;
+}
+
+.game-history {
+	float:right;
+	position:absolute;
+	right: 10px;
+	top:10px;
+}
+.game-stats {
+	text-align: center;
+}
+
+.game-stats {
+	display:inline;
+}
+.debugging-info {
+	display:inline;
+}
+.game-info-table {
+	width:100%;
+	text-align: center;
+	font-size:1.5em;
+}
