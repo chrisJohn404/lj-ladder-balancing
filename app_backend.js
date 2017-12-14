@@ -109,9 +109,9 @@ function openDevice() {
 
 	var options = {};
 	if(process.platform === 'win32') {
-		options = {deviceType:'LJM_dtT4',connectionType:'LJM_ctEthernet',identifier:440010101};
+		options = {deviceType:'LJM_dtT4',connectionType:'LJM_ctUSB',identifier:'LJM_idANY'};
 	} else {
-		options = {deviceType:'LJM_dtT4',connectionType:'LJM_ctUSB',identifier:440010101};
+		options = {deviceType:'LJM_dtT4',connectionType:'LJM_ctUSB',identifier:'LJM_idANY'};
 	}
 	deviceManager.open(options)
 	.then(function(deviceInfo) {
