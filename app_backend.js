@@ -48,6 +48,7 @@ function getGameState(FIO4, FIO5) {
 		}
 	}
 	return state;
+	
 }
 var channelMeanings = {
 	'FIO4': 'legs',
@@ -227,8 +228,9 @@ function collectData() {
 
 		gameState.AIN0_VAL = results[0].val;
 		gameState.FIO4 = results[1].val;
+		gameState.FIO4_VAL = results[1].val;
 		gameState.FIO5 = results[2].val;
-
+		gameState.FIO5_VAL = results[2].val;
 		var curState = gameState.currentState;
 		var newState = getGameState(gameState.FIO4, gameState.FIO5);
 

@@ -55,8 +55,15 @@
             <span>Standing?</span>   <span id="isStandingOnLadder"></span><br>
             <span>Ladder Feet on Ground?</span>   <span id="areFeetOnGround"></span><br>
             <span>Balancing?</span>   <span id="isBalancingOnLadder"></span><br>
+            <span>Values: FIO4(</span>
+            <span id="FIO4_VAL"></span>
+            <span>) FIO5(</span>
+            <span id="FIO5_VAL"></span>
+            <span>)</span><br>
+
             <button id="enterFullScreen">Full Screen</button>
             <button id="exitFullScreen">Exit Full Screen</button>
+            <button id="reloadPage">Reload Page</button>
           </div>
     <!-- AIN0 Value: <span id="AIN0_VAL"></span><br> -->
 
@@ -169,6 +176,8 @@
         areFeetOnGround: $('#areFeetOnGround'),
         isBalancingOnLadder: $('#isBalancingOnLadder'),
         curGameState: $('#curGameState'),
+        FIO4_VAL: $('#FIO4_VAL'),
+        FIO5_VAL: $('#FIO5_VAL'),
 
         curThrustDuration:$('#curThrustDuration'),
         lastThrustDuration:$('#lastThrustDuration'),
@@ -179,6 +188,7 @@
         resetScoresButton: $('#resetScoresButton'),
         enterFullScreen: $('#enterFullScreen'),
         exitFullScreen: $('#exitFullScreen'),
+        reloadPage: $('#reloadPage'),
 
         gameImmage: $('#gameImmage'),
 
@@ -191,6 +201,9 @@
         scoreHistory = [];
         updateScores();
       })
+      cachedElements.reloadPage.on('click',function() {
+        location.reload();
+      });
 
       cachedElements.enterFullScreen.on('click', function() {
         document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
@@ -233,7 +246,9 @@
             cachedElements.debuggingInfo.hide();
           }
         }
-
+        console.log('FIO5_VAL',data.FIO4_VAL,data.FIO5_val);
+        cachedElements.FIO4_VAL.text(data.FIO4_VAL);
+        cachedElements.FIO5_VAL.text(data.FIO5_VAL);
         cachedElements.ain0Val.text(data.AIN0_VAL);
         cachedElements.currentTime.text(data.curTime.toString());
         cachedElements.sn.text(data.sn);
