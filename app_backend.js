@@ -79,6 +79,9 @@ dmEventKeys.forEach(function(eventKey) {
 });
 
 var gameState = {
+	'updateDebugInfoVisibility': false,
+	'debugInfoIsVisible': false,
+
 	'curTime': new Date(),
 	'AIN0_VAL': 0,
 	'FIO4': 0,
@@ -130,6 +133,10 @@ function openDevice() {
 
 		gameState.ct = deviceInfo.savedAttributes.connectionTypeName;
 		gameState.sn = deviceInfo.savedAttributes.serialNumber;
+		setTimeout(function hideDebugInfo() {
+			gameState.updateDebugInfoVisibility = true;
+			gameState.debugInfoIsVisible = true
+		}, 5000);
 		defered.resolve();
 	})
 	.catch(function(err) {
@@ -189,6 +196,7 @@ function updateState(val) {
 	}
 	gameState.displayRandomFail = false;
 	gameState.displayRandomThrust = false;
+	gameState.updateDebugInfoVisibility = false;
 }
 function updateDisplay() {
 	// var defered = q.defer();
@@ -261,7 +269,7 @@ function collectData() {
 				gameState.startTimeMS = 0;
 				gameState.finishingTimeMS = 0;
 				gameState.duration = 0;
-				gameState.message = 'Stop Cheating!!, return to ready position!';
+				gameState.message = 'Stop Cheating!! Return to ready position!';
 				gameState.messageReported = false;
 				gameState.cheated = true;
 			}

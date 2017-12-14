@@ -14,8 +14,8 @@
     <meta charset="UTF-8">
     <title>Hello World!</title>
   </head>
-  <body>
-    <img id="gameImmage" src="" style="position:absolute;left:70%;"/>
+  <body id=bodyTag">
+    <img id="gameImmage" src="" style=""/>
     <!-- All of the Node.js APIs are available in this renderer process. -->
     <!-- We are using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
@@ -31,7 +31,7 @@
     </div>
     <table class="game-info-table">
       <tr>
-        <td>
+        <td class="game-stats-col">
           <div class="game-stats">
             <span>Game State:</span><br>
             <span>Thrust Duration:</span><br>
@@ -47,8 +47,9 @@
                <span id="gameMessage"></span><br>
           </div>
         </td>
-        <td>
-          <div class="debugging-info" style="display:none;">
+      </tr>
+    </table>
+    <div class="debugging-info debuggingInfo" style="">
             <span>Device SN: </span><span id="DEVICE_SN"></span><br>
             <span>Current Time: </span><span id="CURRENT_TIME"></span><br>
             <span>Standing?</span>   <span id="isStandingOnLadder"></span><br>
@@ -57,23 +58,28 @@
             <button id="enterFullScreen">Full Screen</button>
             <button id="exitFullScreen">Exit Full Screen</button>
           </div>
-        </td>
-      </tr>
-    </table>
-    
     <!-- AIN0 Value: <span id="AIN0_VAL"></span><br> -->
 
     <script>
+      const fs = require('fs');
+      const path = require('path');
+      
+      var failImages = fs.readdirSync('./funny_gifs/fails').map((file)=>{
+        return path.join('.','funny_gifs','fails',file);
+      });
+      var thrustImages = fs.readdirSync('./funny_gifs/thrusts').map((file)=>{
+        return path.join('.','funny_gifs','thrusts',file);
+      });
 
-      var thrustImages = [
-        './funny_gifs/duff_man.gif',
-        './funny_gifs/jim-carrey.gif',
-        './funny_gifs/storm_trooper.gif',
-      ];
-      var failImages = [
-        './funny_gifs/spiderman_fail.webp',
-        './funny_gifs/mr_garrison_fail.webp',
-      ]
+      // var fs = [
+      //   './funny_gifs/duff_man.gif',
+      //   './funny_gifs/jim-carrey.gif',
+      //   './funny_gifs/storm_trooper.gif',
+      // ];
+      // var failImages = [
+      //   './funny_gifs/spiderman_fail.webp',
+      //   './funny_gifs/mr_garrison_fail.webp',
+      // ]
 
       function getRandomArbitrary(min, max) {
         return Math.random() * (max - min) + min;
@@ -87,13 +93,31 @@
         cachedElements.gameImmage.attr('src','');
       }
       function displayRandomFail() {
+        console.log('in displayRandomFail');
         // var failImage = getRandomImage(failImages);
-        cachedElements.gameImmage.attr('src',getRandomImage(failImages));
+        
+        var url = getRandomImage(failImages);
+        cachedElements.gameImmage.attr('src',url);
+        
+        
+        // cachedElements.bodyTag.css('background-image',url);
+
+        console.log('in displayRandomFail',url);
         setTimeout(hideImage, 1500);
       }
       function displayRandomThrust() {
+        console.log('in displayRandomThrust');
         // var thrustImages = getRandomImage(thrustImages);
-        cachedElements.gameImmage.attr('src',getRandomImage(thrustImages));
+
+        // $('myOjbect').css('background-image', 'url(' + imageUrl + ')');
+
+
+        var url = getRandomImage(thrustImages) ;
+        cachedElements.gameImmage.attr('src',url);
+        
+        // cachedElements.bodyTag.css('background-image',url);
+        console.log('in displayRandomThrust',url);
+
         setTimeout(hideImage, 1500);
       }
 
@@ -157,6 +181,10 @@
         exitFullScreen: $('#exitFullScreen'),
 
         gameImmage: $('#gameImmage'),
+
+
+        'debuggingInfo': $('.debuggingInfo'),
+        bodyTag: $('#bodyTag'),
       };
 
       cachedElements.resetScoresButton.on('click', function() {
@@ -194,6 +222,17 @@
       backendManager.on(backend_manager.events.UPDATE_GAME_STATE, (data) => {
         // console.log('updating state',data);
 
+        
+        
+
+        if(data.updateDebugInfoVisibility) {
+          console.log('Need to update info',  data.updateDebugInfoVisibility,data.debugInfoIsVisible);
+          if(data.debugInfoIsVisible) {
+            cachedElements.debuggingInfo.hide();
+          } else {
+            cachedElements.debuggingInfo.hide();
+          }
+        }
 
         cachedElements.ain0Val.text(data.AIN0_VAL);
         cachedElements.currentTime.text(data.curTime.toString());
