@@ -4,7 +4,8 @@
     <!-- Insert this line above script imports  -->
     <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
-
+    <!-- <style src="./css/app-style.css"></style> -->
+    <link rel="stylesheet" type="text/css" href="./css/app-style.css">
     <script src="./libs/jquery-3.2.1.min.js"></script>
 
     <!-- Insert this line after script imports -->
@@ -14,34 +15,51 @@
     <title>Hello World!</title>
   </head>
   <body>
-    
+    <img id="gameImmage" src="" style="position:absolute;left:70%;"/>
     <!-- All of the Node.js APIs are available in this renderer process. -->
     <!-- We are using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.<br> -->
-    <div style="top:0px; position: absolute;">
-      <h1>Thrust Master 2020</h1>
-      <span>Game State:</span>   <span id="curGameState"></span><br>
-      <span>Thrust Duration:</span>   <span id="curThrustDuration"></span><br>
-      <span>Last Thrust Duration:</span>   <span id="lastThrustDuration"></span><br>
-      <span>Game Message:</span>   <span id="gameMessage"></span><br>
-      <img id="gameImmage" src="" style="position:absolute;left:70%;"/>
+    <div>
+      <h1 class="product-title">Thrust Master 2020</h1>
     </div>
-    <div style="top:30px; right:30px;position: absolute;">
+    <div class="game-history">
       <span>Longest Thrust Sessions:</span><br>
       <div id="historicalScoresHolder">
       </div>
       <button id="resetScoresButton">Reset Scores</button>
     </div>
-    <div style="bottom:0px; position: absolute;">
-      <span>Device SN: </span><span id="DEVICE_SN"></span><br>
-      <span>Current Time: </span><span id="CURRENT_TIME"></span><br>
-      <span>Standing?</span>   <span id="isStandingOnLadder"></span><br>
-      <span>Ladder Feet on Ground?</span>   <span id="areFeetOnGround"></span><br>
-      <span>Balancing?</span>   <span id="isBalancingOnLadder"></span><br>
-      <button id="enterFullScreen">Full Screen</button>
-      <button id="exitFullScreen">Exit Full Screen</button>
-    </div>
+    <table class="game-info-table">
+      <tr>
+        <td>
+          <div class="game-stats">
+            <span>Game State:</span><br>
+            <span>Thrust Duration:</span><br>
+            <span>Last Thrust Duration:</span><br>
+            <span>Game Message:</span><br>
+          </div>
+        </td>
+        <td>
+          <div class="game-stats-data">
+               <span id="curGameState"></span><br>
+               <span id="curThrustDuration"></span><br>
+               <span id="lastThrustDuration"></span><br>
+               <span id="gameMessage"></span><br>
+          </div>
+        </td>
+        <td>
+          <div class="debugging-info" style="display:none;">
+            <span>Device SN: </span><span id="DEVICE_SN"></span><br>
+            <span>Current Time: </span><span id="CURRENT_TIME"></span><br>
+            <span>Standing?</span>   <span id="isStandingOnLadder"></span><br>
+            <span>Ladder Feet on Ground?</span>   <span id="areFeetOnGround"></span><br>
+            <span>Balancing?</span>   <span id="isBalancingOnLadder"></span><br>
+            <button id="enterFullScreen">Full Screen</button>
+            <button id="exitFullScreen">Exit Full Screen</button>
+          </div>
+        </td>
+      </tr>
+    </table>
     
     <!-- AIN0 Value: <span id="AIN0_VAL"></span><br> -->
 
